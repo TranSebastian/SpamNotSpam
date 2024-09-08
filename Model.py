@@ -1,10 +1,11 @@
 import csv
 import sys
 import EmailGroup
+import matplotlib.pyplot as plt
 
 class Model:
     def __init__(self):
-        # magic to get csv file to read. Java does this stuff better NO HATE!!
+        # magic to get csv file to read.
         maxInt = sys.maxsize    
         while True:
             try:
@@ -18,19 +19,50 @@ class Model:
             dataset = csv.reader(file)
             next(dataset, None) #clear headers
 
-            spam = list()
-            notSpam = list()
+            self.spam = list()
+            self.notSpam = list()
+            avgSpamLen = 0
+            avgNSLen = 0
+
             var = 0
             for line in dataset:
-                if (line[1] == '0' and len(notSpam) < 500 and var % 5 == 0):
-                    notSpam.append(line[0])
-                elif (line[1] == '1' and len(spam) < 500):
-                    spam.append(line[0])
+                if (line[1] == '0' and len(self.notSpam) < 250 and var % 5 == 0):
+                    self.notSpam.append(line[0])
+                    avgNSLen += len(line[0])
+                elif (line[1] == '1' and len(self.spam) < 250 and var % 2 == 0):
+                    self.spam.append(line[0])
+                    avgSpamLen += len(line[0])
                 var += 1
 
-        self.nsGroup = EmailGroup.EmailGroup(notSpam)
-        self.sGroup = EmailGroup.EmailGroup(spam)
+        print(avgSpamLen/250)
+        print(avgNSLen/250)
+        self.nsGroup = EmailGroup.EmailGroup(self.notSpam)
+        self.sGroup = EmailGroup.EmailGroup(self.spam)
         self.nsGroup.enhancePrecision(self.sGroup)
+    
+    #   because more than 2 dimensions are used, we'll just use email group distance
+    #   to represent an email graphically
+    def graphDatapoints (self):
 
-        self.nsGroup.distance(spam[0])
-        self.sGroup.distance(spam[0])
+        #spam data points
+        nsSpamList = list()
+        sSpamList = list()
+        for email in self.spam:
+            nsSpamList.append(self.nsGroup.distance(email))
+            sSpamList.append(self.sGroup.distance(email))
+
+        #not spam data
+        sNotSpamList = list()
+        nsNotSpamList = list()
+        for email in self.notSpam:
+            nsNotSpamList.append(self.nsGroup.distance(email))
+            sNotSpamList.append(self.sGroup.distance(email))
+
+        plt.scatter(nsSpamList, nsNotSpamList, color='blue', label="not spam")
+        plt.scatter(sSpamList, sNotSpamList, color='red', label="spam")
+        plt.legend()
+        plt.show()
+
+
+test = Model()
+test.graphDatapoints()

@@ -1,6 +1,7 @@
 import csv
 
 class EmailGroup:
+    #constructor, takes in a group of emails
     def __init__(self, emailList):
 
         temp = dict()
@@ -22,14 +23,12 @@ class EmailGroup:
 
             if (temp[word] > 1):
                 self.emailCount[word] = temp[word]
-                #print(word + "\t" + str(self.emailCount[word]))
-
-        #print (len(self.emailCount))
     
+    #takes in another email group to fine tune distances
     def enhancePrecision (self, other):
-        for key in other.emailCount:
-            if (key in self.emailCount):
 
+        for key in other.emailCount:
+            if (key in self.emailCount):                
                 selfVal = self.emailCount[key]
                 otherVal = other.emailCount[key]
                 self.emailCount[key] = selfVal - otherVal
@@ -42,9 +41,10 @@ class EmailGroup:
             if (key not in other.emailCount):
                 other.emailCount[key] = 0
 
-        print (len(self.emailCount))
-        print (len(other.emailCount))
+        print (self.emailCount)
+        print (other.emailCount)
 
+    #calculates 
     def distance (self, email):
        
        #create dictionary
@@ -65,6 +65,5 @@ class EmailGroup:
                 num += self.emailCount[key] ** 2
 
         num = num ** (1/2)
-        print(num)
         return num
 
