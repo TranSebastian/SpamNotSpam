@@ -3,10 +3,11 @@ import csv
 class EmailGroup:
     #constructor, takes in a group of emails
     def __init__(self, emailList):
-
+        avgLen = 0
         temp = dict()
         for email in emailList:
             words = email.split(" ")    #seperate email into words
+            avgLen += len(email)
 
             #get word counts
             for word in words:              
@@ -15,36 +16,15 @@ class EmailGroup:
                     temp[word] += 1
                 else:
                     temp[word] = 1.0
-        
+        avgLen /= len(emailList)  
+
         # get averages and place signifcant words into field dictionary
         self.emailCount = dict()
         for word in temp:
-            temp[word] = temp[word]/len(emailList)
+            temp[word] = temp[word]/avgLen
+            self.emailCount[word] = temp[word] 
 
-            if (temp[word] > 1):
-                self.emailCount[word] = temp[word]
-    
-    #takes in another email group to fine tune distances
-    def enhancePrecision (self, other):
-
-        for key in other.emailCount:
-            if (key in self.emailCount):                
-                selfVal = self.emailCount[key]
-                otherVal = other.emailCount[key]
-                self.emailCount[key] = selfVal - otherVal
-                other.emailCount[key] = otherVal - selfVal
-
-            else:
-                self.emailCount[key] = 0
-
-        for key in self.emailCount:
-            if (key not in other.emailCount):
-                other.emailCount[key] = 0
-
-        print (self.emailCount)
-        print (other.emailCount)
-
-    #calculates 
+    #calculates euclidean distance from this email group
     def distance (self, email):
        
        #create dictionary
