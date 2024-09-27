@@ -7,15 +7,15 @@ class EmailGroup:
         temp = dict()
         for email in emailList:
             words = email.split(" ")    #seperate email into words
-            avgLen += len(email)
+            avgLen += len(words)
 
             #get word counts
             for word in words:              
-
                 if (word in temp):    #determine if word exists
                     temp[word] += 1
                 else:
                     temp[word] = 1.0
+                    
         avgLen /= len(emailList)  
 
         # get averages and place signifcant words into field dictionary
@@ -30,17 +30,16 @@ class EmailGroup:
        #create dictionary
         temp = dict()
         for word in email.split(" "):              
-
             if (word in temp): 
                 temp[word] += 1
             else:
                 temp[word] = 1.0
 
-        ## euclidean distance
+        # euclidean distance
         num = 0
         for key in self.emailCount:
             if (key in temp):
-                num += ( self.emailCount[key] - temp[key] ) ** 2
+                num += (self.emailCount[key] - temp[key] ) ** 2
             else:
                 num += self.emailCount[key] ** 2
 

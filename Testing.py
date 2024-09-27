@@ -29,12 +29,15 @@ with open('spam_or_not_spam.csv', mode ='r', encoding="utf8") as file:
             spam.append(line[0])
 
         #testing data
-        elif (line[1] == '0' and len(testNotSpam) < 250):
+        elif (line[1] == '0' and len(testNotSpam) < 250 and var % 10 != 0):
             testNotSpam.append(line[0])
         elif (line[1] == '1'):
             testSpam.append(line[0])
 
         var += 1
 
-test= Model.Model(spam, notSpam, testSpam, testNotSpam)
-test.graphDatapoints()
+test= Model.Model(spam, notSpam)
+print("FUCK")
+print(test.predict(testSpam[0]))
+#test.exportData()
+#test.graphDatapoints()
