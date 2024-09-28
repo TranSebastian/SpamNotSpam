@@ -1,13 +1,14 @@
 import EmailGroup
 import matplotlib.pyplot as plt
 import csv
+import math
 
 class Model:
-    #   constructor reads takes in 2 datasets
+    #   constructor takes in 2 datasets
     def __init__(self, spam, notSpam):
         self.nsGroup = EmailGroup.EmailGroup(notSpam)
         self.sGroup = EmailGroup.EmailGroup(spam)
-        
+
         self.coordinatesSpam = []
         self.coordinatesNotSpam = []
 
@@ -17,12 +18,13 @@ class Model:
         i = 0
         for dataset in datasets:
             for email in dataset:             
-                storedIn[i].append((self.nsGroup.distance(email), self.sGroup.distance(email)))
+                storedIn[i].append([self.nsGroup.distance(email), self.sGroup.distance(email)])
             i += 1
     
     #   because more than 2 dimensions are used, we'll just use email 
     #   group distance to represent an email graphically
     def graphDatapoints (self):
+
         datasets = [self.coordinatesSpam, self.coordinatesNotSpam]
         colors = ["red", "blue"]
         labels = ["spam", "not spam"]
@@ -56,32 +58,59 @@ class Model:
     def predict (self, email):
         x = self.nsGroup.distance(email)
         y = self.sGroup.distance(email)
+        print("( " + str(x) + " , " + str(y) + " )")
+        plt.plot(x,y,'go') 
 
-        nsDistance = list()
-        sDistance = list()
-        distances = [nsDistance, sDistance]
-        coordinates = [self.coordinatesNotSpam, self.coordinatesSpam]
-        x = 0
+        spamDistances = []
+        hamDistances = []
+        all = []
+        coords = dict()
+
+        for point in self.coordinatesNotSpam:
+            var = math.dist(point, [x,y])
+            hamDistances.append(var)
+            coords[var] = point
         
-        for coord in coordinates:
-            for point in coord:
-                var = (x - point[0])**2 + (y - point[1])**2
-                distances[x].append(var ** (1/2))
-            distances[x].sort()
-            distances[x] = distances[x][:7]
-            x += 1
+        for point in self.coordinatesSpam:
+            var = math.dist(point, [x,y])
+            spamDistances.append(var)
+            coords[var] = point
+            
+        spamDistances.sort()
+        hamDistances.sort()
 
-        neighborS = set()
-        neighborNS = set()
-        for distance in nsDistance :
-            for compare in sDistance :
-                if (distance < compare):
-                    neighborNS.add(distance)
-                else:
-                    neighborS.add(compare)
-    
-        if (len(neighborNS) > len(neighborS)):
+        all.extend(spamDistances)
+        all.extend(hamDistances)
+        all.sort()
+        all = all[:7]
+        
+        score = 0
+        line = ""
+        xListS = []
+        yListS = []
+        xListNS = []
+        yListNS = []
+
+        for element in all:
+            if element in hamDistances:
+                score += 1
+                line = line + "ns " 
+                xListNS.append(coords[element][0])
+                yListNS.append(coords[element][1])
+
+            elif element in spamDistances:
+                score -= 1
+                line = line + "s "
+                xListS.append(coords[element][0])
+                yListS.append(coords[element][1])
+
+            line = line + str(coords[element]) + " "+ str(element) + "\n"
+        print (str(score) + "\n" + line)
+        plt.scatter(xListS, yListS, color='red', label='spam')
+        plt.scatter(xListNS, yListNS, color='blue', label='not spam')
+        plt.show()
+
+        if (score > 0):
             return False
-        else:
+        if (score <= 0):
             return True
-        
