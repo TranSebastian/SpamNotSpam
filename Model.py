@@ -18,8 +18,8 @@ class Model:
         tokens.extend(self.sGroup.export())
         tokens = set(tokens)
 
-        self.spamEmails = [Email.Email(tokens, email, self.classify(email)) for email in spam]
-        self.nsEmails = [Email.Email(tokens, email, self.classify(email)) for email in notSpam]
+        self.spamEmails = [Email.Email(email, self.classify(email)) for email in spam]
+        self.nsEmails = [Email.Email(email, self.classify(email)) for email in notSpam]
 
         # for email in spam:
         #     self.spamEmails.append(Email.Email(tokens, email, self.classify(email)))
@@ -85,30 +85,17 @@ class Model:
 
     def predict (self, email, plot = False, console = False):
         x, y = self.classify(email)
-        spamDistances = []
-        hamDistances = []
-        all = []                      
-        coords = dict()     # a way to associate a distance with an email
-
-        # finding the closest points
-        for point in self.nsEmails:
-            var = point.distance(email)
-            hamDistances.append(var)
-            coords[var] = point
+        spamDistances = [(point.distance(email), point) for point in self.spamEmails]
+        hamDistances = [(point.distance(email), point) for point in self.nsEmails]
         
-        for point in self.spamEmails:
-            var = point.distance(email)
-            spamDistances.append(var)
-            coords[var] = point
-            
-        spamDistances.sort()
-        hamDistances.sort()
+        all = []                     
+        spamDistances.sort(key=lambda x: x[0])
+        hamDistances.sort(key=lambda x: x[0])
 
         all.extend(spamDistances)
         all.extend(hamDistances)
-        all.sort()
-        all = list(set(all))
-        all = all[:7]
+        all.sort(key=lambda x: x[0])
+        all = all[:5]
         
         score = 0
         line = ""
@@ -122,16 +109,16 @@ class Model:
             if element in hamDistances:
                 score += 1
                 line = line + "ns " 
-                xListNS.append(coords[element].coordinate[0])
-                yListNS.append(coords[element].coordinate[1])
+                xListNS.append(element[1].coordinate[0])
+                yListNS.append(element[1].coordinate[1])
 
             elif element in spamDistances:
                 score -= 1
                 line = line + "s "
-                xListS.append(coords[element].coordinate[0])
-                yListS.append(coords[element].coordinate[1])
+                xListS.append(element[1].coordinate[0])
+                yListS.append(element[1].coordinate[1])
 
-            line = line + str(coords[element].coordinate) + " "+ str(element) + "\n"
+            line = line + str(element[1].coordinate) + " "+ str(element) + "\n"
         
         if plot:
             plt.plot(x,y,'go') 

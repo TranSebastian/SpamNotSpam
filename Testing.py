@@ -30,26 +30,30 @@ with open('spam_or_not_spam.csv', mode ='r', encoding="utf8") as file:
             spam.append(line[0])
 
         #testing data
-        elif (line[1] == '0'):
+        elif (line[1] == '0' and len(testNotSpam) < 250):
             testNotSpam.append(line[0])
         elif (line[1] == '1'):
             testSpam.append(line[0])
 
         var += 1
 
+print("done adding emails!")
+
 test= Model.Model(spam, notSpam)
 
 correctHam = 0
 for email in testNotSpam:
-    if (test.predict(email, True, True)):
+    if (not test.predict(email, False, False)):
         correctHam += 1
 
-print(correctHam/len(testNotSpam))
+print("getting there!")
 
 correctSpam = 0
 for email in testSpam:
-    if (test.predict(email)):
+    if (test.predict(email, False, False)):
         correctSpam += 1
+
+print(correctHam/len(testNotSpam))
 
 print(correctSpam/len(testSpam))
 

@@ -3,16 +3,15 @@ class Email:
     # constructor takes in the list of words to look for, the email
     # and the coordinate associated with the email produced by email group
 
-    def __init__(self, words, email, coordinate):
+    def __init__(self, email, coordinate):
         
         self.coordinate = coordinate        # helpful to store coordinate here for easy graphing
         self.wordCount = dict()             # stores the relavant counts of words provided by email group
         for index in email.split(" "):
-            if index in words:
-                if index in self.wordCount:
-                    self.wordCount[index] += 1
-                else:
-                    self.wordCount[index] = 1
+            if index in self.wordCount:
+                self.wordCount[index] += 1
+            else:
+                self.wordCount[index] = 1
     
     # DISTANCE
     # distance takes in a email string and turns it into a dictionary
@@ -33,6 +32,10 @@ class Email:
                 total += (temp[key] - self.wordCount[key])**2
             else:
                 total += (self.wordCount[key])**2
+
+        for key in temp:
+            if key not in self.wordCount:
+                total += temp[key]**2
         
         return total**(1/2)
 
